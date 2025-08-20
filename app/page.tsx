@@ -5,6 +5,8 @@ import RealtimeProvider from '@/components/RealtimeProvider'
 import Link from 'next/link'
 import { TableStatus } from '@prisma/client'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const tables = await prisma.table.findMany({
     orderBy: [{ y: 'asc' }, { x: 'asc' }]
