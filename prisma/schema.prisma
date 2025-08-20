@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TableStatus {
+  available
+  occupied
+  reserved
+}
+
+enum ReservationStatus {
+  created
+  confirmed
+  cancelled
+  seated
+  completed
+}
+
+model Table {
+  id        Int           @id @default(autoincrement())
+  name      String        @unique
+  capacity  Int
+  x         Int
+  y         Int
+  status    TableStatus   @default(available)
+  reservations Reservation[]
+  seatings  Seating[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Reservation {
+  id              Int               @id @default(autoincrement())
+  guestName       String
+  phone           String
+  partySize       Int
+  startAt         DateTime
+  specialRequests String?
+  status          ReservationStatus @default(created)
+  tableId         Int?
+  table           Table?            @relation(fields: [tableId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([startAt])
+  @@index([phone])
+}
+
+model Seating {
+  id        Int      @id @default(autoincrement())
+  tableId   Int
+  table     Table    @relation(fields: [tableId], references: [id])
+  partySize Int
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startedAt])
+  @@index([endedAt])
+}
